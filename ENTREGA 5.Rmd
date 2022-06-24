@@ -1,0 +1,283 @@
+---
+title: "TRABAJO GRUPAL - ESTADISTICA PARA EL ANALISIS POLÍTICO 2"
+output: html_document
+date: '2022-05-12'
+---
+
+```{r}
+library(rio)
+```
+## Introducción
+
+La mortalidad en países en vías de desarrollo es un tema importante a tratar debido a que ello puede explicar la salud pública en una región. De tal forma, comparar tales indices con los de países considerados potencias puede resultar en un análisis interesante y sustancial para materializar las brechas que se amplian o reducen con los años entre estos. En ese sentido, se utilizarán dos variables que contribuyen considerablemente a la explicación de la problematica ya mencionada: el gasto publico en salud y la prevalencia de la desnutrición. Asimismo, este estudio posee un analisis a nivel países y durante el año 2017. 
+
+## Objetivos
+
+- Caracterizar la mortalidad por gasto publico en salud utilizando modelos estadísticos que evidencien que tan relacionadas se encuentran ambas variables en terminos de causalidad
+
+- Caracterizar la mortalidad por prevalencia de desnutricion utilizando modelos estadisticos que evidencien que tan relacionadas se encuentran ambas variables en terminos de causalidad
+
+-
+
+**Variables**
+```{r,echo=FALSE}
+library(rio)
+GASTO_PUBLICO_SALUD_2017 = read.csv("https://raw.githubusercontent.com/robbchavez/TRABAJO-FINAL-EST2/main/GASTO%20PUBLICO%20SALUD%202017.csv")
+```
+
+```{r,echo=FALSE}
+PREVALENCIA_DE_DESNUTRICION_2017 = read.csv("https://raw.githubusercontent.com/robbchavez/TRABAJO-FINAL-EST2/main/PREVALENCIA%20DE%20DESNUTRICION%202017.csv")
+```
+
+```{r,echo=FALSE}
+TASA_DE_MORTALIDAD_2017 = read.csv("https://raw.githubusercontent.com/robbchavez/TRABAJO-FINAL-EST2/main/TASA%20DE%20MORTALIDAD%202017.csv")
+```
+
+```{r,echo=FALSE}
+GASTO_PUBLICO_SALUD_2017[GASTO_PUBLICO_SALUD_2017 ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+TASA_DE_MORTALIDAD_2017[TASA_DE_MORTALIDAD_2017 ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+PREVALENCIA_DE_DESNUTRICION_2017[PREVALENCIA_DE_DESNUTRICION_2017 ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+GASTO_PUBLICO_SALUD_2017=GASTO_PUBLICO_SALUD_2017[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(3:4)]
+```
+
+
+```{r,echo=FALSE}
+TASA_DE_MORTALIDAD_2017=TASA_DE_MORTALIDAD_2017[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(1:2)]
+```
+
+```{r,echo=FALSE}
+PREVALENCIA_DE_DESNUTRICION_2017=PREVALENCIA_DE_DESNUTRICION_2017[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(3:4)]
+```
+
+```{r,echo=FALSE}
+names(GASTO_PUBLICO_SALUD_2017) = c("Country Name", "Country Code", "Gasto Publico Salud 2017")
+GASTO_PUBLICO_SALUD_2017$`Gasto Publico Salud 2017` = as.numeric(GASTO_PUBLICO_SALUD_2017$`Gasto Publico Salud 2017`)
+```
+
+```{r,echo=FALSE}
+names(TASA_DE_MORTALIDAD_2017) = c("Country Name", "Country Code", "Tasa de Mortalidad 2017")
+TASA_DE_MORTALIDAD_2017$`Tasa de Mortalidad 2017` = as.numeric(TASA_DE_MORTALIDAD_2017$`Tasa de Mortalidad 2017`)
+```
+
+```{r,echo=FALSE}
+names(PREVALENCIA_DE_DESNUTRICION_2017) = c("Country Name", "Country Code", "Prevalencia de Desnutricion 2017")
+PREVALENCIA_DE_DESNUTRICION_2017$`Prevalencia de Desnutricion 2017` = as.numeric(PREVALENCIA_DE_DESNUTRICION_2017$`Prevalencia de Desnutricion 2017`)
+```
+
+```{r,echo=FALSE}
+DataG = merge(GASTO_PUBLICO_SALUD_2017, TASA_DE_MORTALIDAD_2017, by = c("Country Name", "Country Code"))
+```
+
+```{r,echo=FALSE}
+DataG = merge(DataG, PREVALENCIA_DE_DESNUTRICION_2017, by = c("Country Name", "Country Code"))
+```
+
+```{r,echo=FALSE}
+DataG = na.omit(DataG)
+```
+
+```{r,echo=FALSE}
+names(DataG) = c("Country Name", "Country Code", "Gasto Publico en Salud", "Tasa de Mortalidad", "Prevalencia de Desnutricion")
+modelo1 = formula(`Tasa de Mortalidad`~`Gasto Publico en Salud`+`Prevalencia de Desnutricion`)
+rg=lm(modelo1,data=DataG)
+summary(rg)
+```
+```{r,echo=FALSE}
+reg1=lm(modelo1,data=DataG)
+library(stargazer)
+stargazer(reg1, type = "text")
+```
+Prueba Anova
+```{r,echo=FALSE}
+anova(rg)
+```
+**Entrega 3**
+```{r,echo=FALSE}
+independ = data.frame(DataG$`Gasto Publico en Salud`, DataG$`Prevalencia de Desnutricion`)
+```
+
+```{r,echo=FALSE}
+row.names(independ)=DataG$`Country Name`
+```
+
+```{r,echo=FALSE}
+boxplot(independ,horizontal=T,las=2,cex.axis=0.3)
+```
+```{r,echo=FALSE}
+boxplot(log(independ),horizontal=T,las=2,cex.axis=0.3)
+```
+```{r,echo=FALSE}
+boxplot(scale(independ),horizontal=T,las=2,cex.axis=0.3)
+```
+```{r,echo=FALSE}
+library(cluster)
+#install.packages("fpc")
+library(fpc)
+#install.packages("factoextra")
+library(factoextra)
+independ = log(independ)
+set.seed(123)
+g.dist = daisy(independ, metric="gower")
+```
+
+```{r,echo=FALSE}
+fviz_nbclust(independ, pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
+```
+
+```{r,echo=FALSE}
+fviz_nbclust(independ, hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F,hc_func = "agnes")
+```
+
+```{r,echo=FALSE}
+fviz_nbclust(independ, hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F,hc_func = "diana")
+```
+```{r,echo=FALSE}
+set.seed(123)
+res.pam=pam(g.dist,k = 2,cluster.only = F)
+independ$pam=res.pam$cluster
+```
+
+```{r,echo=FALSE}
+res.agnes <- hcut(g.dist, k = 2,hc_func='agnes')
+independ$agnes=res.agnes$cluster
+res.diana <- hcut(g.dist, k = 2,hc_func='diana')
+independ$diana=res.diana$cluster
+```
+
+```{r,echo=FALSE}
+fviz_silhouette(res.pam)
+```
+
+```{r,echo=FALSE}
+fviz_silhouette(res.agnes)
+```
+
+```{r,echo=FALSE}
+fviz_silhouette(res.diana)
+```
+```{r,echo=FALSE}
+aggregate(data=independ,.~diana,FUN=mean)
+```
+
+```{r,echo=FALSE}
+independ$diana = factor(independ$diana, 
+                    levels = c(1:2), 
+                    labels = c("Baja salud","Alta salud"))
+```
+
+```{r,echo=FALSE}
+fviz_dend(res.diana, cex = 0.4, horiz = T)
+```
+```{r,echo=FALSE}
+ANEMIA = read.csv("https://raw.githubusercontent.com/JimenaHA/Trabajo_Grupal/main/Data_anemia.csv")
+```
+
+```{r,echo=FALSE}
+ANEMIA[ANEMIA ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+ANEMIA=ANEMIA[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(1:2)]
+```
+
+```{r,echo=FALSE}
+names(ANEMIA) = c("Country Name", "Country Code", "Anemia")
+```
+
+```{r,echo=FALSE}
+ANEMIA$`Anemia` = as.numeric(ANEMIA$`Anemia`)
+```
+
+```{r,echo=FALSE}
+ACCESOAGUA = read.csv("https://raw.githubusercontent.com/JimenaHA/Trabajo_Grupal/main/AccesAgua_Data.csv")
+```
+
+```{r,echo=FALSE}
+ACCESOAGUA[ACCESOAGUA ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+ACCESOAGUA=ACCESOAGUA[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(3:4)]
+```
+
+
+```{r,echo=FALSE}
+names(ACCESOAGUA) = c("Country Name", "Country Code", "Acceso al Agua")
+```
+
+```{r,echo=FALSE}
+ACCESOAGUA$`Acceso al Agua` = as.numeric(ACCESOAGUA$`Acceso al Agua`)
+```
+
+```{r,echo=FALSE}
+DataG=merge(DataG, ANEMIA, by = c("Country Name", "Country Code"))
+DataG=merge(DataG, ACCESOAGUA, by = c("Country Name", "Country Code"))
+```
+
+## Análisis Factorial Exploratorio
+Demostraremos si el valor final que nos dan las dos variables independientes es correcto, que tan bien medido ha sido.
+
+```{r,echo=FALSE}
+library(polycor)
+dataMatrixF=DataG[,c(3,5,6,7)]
+MatrixFact=polycor::hetcor(dataMatrixF)$correlations
+```
+
+```{r,echo=FALSE}
+#install.packages("ggcorrplot")
+library(ggcorrplot)
+ggcorrplot(MatrixFact)
+```
+```{r,echo=FALSE}
+#install.packages("psych")
+library(psych)
+psych::KMO(MatrixFact) 
+```
+Verificar si la matriz de corrrelaciones es adecuada
+
+```{r,echo=FALSE}
+cortest.bartlett(MatrixFact,n=nrow(DataG))$p.value>0.05
+```
+```{r,echo=FALSE}
+#install.packages("matrixcalc")
+library(matrixcalc)
+is.singular.matrix(MatrixFact)
+```
+```{r,echo=FALSE}
+fa.parallel(dataMatrixF,fm = 'ML', fa = 'fa',correct = T)
+```
+```{r,echo=FALSE}
+#install.packages("GPArotation")
+library(GPArotation)
+resultF <- fa(dataMatrixF,
+            nfactors = 1,
+            cor = 'mixed',
+            rotate = "varimax",
+            fm="minres")
+print(resultF$loadings)
+```
+```{r,echo=FALSE}
+print(resultF$loadings,cutoff = 0.5)
+```
+```{r,echo=FALSE}
+fa.diagram(resultF)
+```
+```{r,echo=FALSE}
+sort(resultF$communality)
+```
+```{r,echo=FALSE}
+sort(resultF$complexity)
+```
+```{r}
+
+```
+
