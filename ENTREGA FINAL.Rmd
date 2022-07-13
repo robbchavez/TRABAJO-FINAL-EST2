@@ -1,0 +1,419 @@
+---
+title: "TRABAJO FINAL - ESTADISTICA PARA EL ANALISIS POLÍTICO 2"
+output: html_document
+date: '2022-05-12'
+---
+# EXPLICANDO LA TASA DE MORTALIDAD EN PAÍSES DEL MUNDO A TRAVES DE LA ALIMENTACIÓN Y LA INVERSIÓN PÚBLICA
+### **Roberto Fabian Chavez Tirado - 20191296**
+
+**LINK DE GITHUB**: https://github.com/robbchavez/TRABAJO-FINAL-EST2
+
+```{r,echo=FALSE}
+library(rio)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+### Introducción
+
+La mortalidad refiere a la accion de muerte de individuos que pertenecen a cierta poblacion. Este concepto y su analisis posee bastante relevancia en países en vías de desarrollo ya que ello puede explicar la salud pública en una región. Ademas, el INEI menciona que la importancia de realizar un estudio para conocer los indicadores que lo ocasionan recae en el impacto que este indice posee en los grupos etarios y para conocer las condiciones de salud de una poblacion (1, 2000). De tal forma, comparar tales indices con los de países considerados potencias puede resultar en un análisis interesante y sustancial para materializar las brechas que se amplian o reducen con los años entre estos. En ese sentido, se utilizarán dos variables que contribuyen considerablemente a la explicación de la problematica ya mencionada: el gasto publico en salud y la prevalencia de la desnutrición. Asimismo, este estudio posee un analisis a nivel países y durante el año 2017. 
+Si bien el trabajo busca evidenciar los indices de injerencia de las variables dependientes para poder explicar la variable dependiente, el planteamiento del trabajo se explica por la tasa de mortalidad y su justificación en la inversión estatal en salud y, tambien, el acceso a una alimentacion de calidad. Esto debido a los indices de correlacion que s ehan podido evidenciar durante el desarrollo de la investigacion, precisamente durante el Analisis Factorial Exploratorio y, tambien, el Confirmatorio. 
+
+### Justificación
+Resulta relevante el análisis de la tasa de mortalidad en cada pais debido a que, como se menciono, ello nos ayuda a comparar las brechas que se amplian o reducen entre los países en vias de desarrollo y países considerados potencias. Asimismo, resulta interesante como las variables independientes seleccionadas al inicio de la investigacion terminan por configurar otras variables, las cuales cumplen el objetivo de explicar y darle sentido a la variable dependiente que es la Tasa de Mortalidad. 
+
+### Objetivos
+
+- Investigar la relación de la variable dependiente, tasa de mortalidad, con las variables independientes, gasto publico en salud y desnutricion. 
+
+- Caracterizar la mortalidad por gasto publico en salud utilizando modelos estadísticos que evidencien que tan relacionadas se encuentran ambas variables en terminos de causalidad
+
+- Caracterizar la mortalidad por prevalencia de desnutricion utilizando modelos estadisticos que evidencien que tan relacionadas se encuentran ambas variables en terminos de causalidad
+
+
+### Metodologia:
+El tipo de metodologia utilizada a lo largo de este estudio es de tipo cuantitativa en la que se utilizarán herramientas estadísticas para el análisis político con el fin de demostrar como influyen diversas variables en la Tasa de Mortalidad.
+
+## **Exploracion del tema y de las variables**
+
+```{r,echo=FALSE}
+library(rio)
+GASTO_PUBLICO_SALUD_2017 = read.csv("https://raw.githubusercontent.com/robbchavez/TRABAJO-FINAL-EST2/main/GASTO%20PUBLICO%20SALUD%202017.csv")
+```
+
+```{r,echo=FALSE}
+PREVALENCIA_DE_DESNUTRICION_2017 = read.csv("https://raw.githubusercontent.com/robbchavez/TRABAJO-FINAL-EST2/main/PREVALENCIA%20DE%20DESNUTRICION%202017.csv")
+```
+
+```{r,echo=FALSE}
+TASA_DE_MORTALIDAD_2017 = read.csv("https://raw.githubusercontent.com/robbchavez/TRABAJO-FINAL-EST2/main/TASA%20DE%20MORTALIDAD%202017.csv")
+```
+
+```{r,echo=FALSE}
+GASTO_PUBLICO_SALUD_2017[GASTO_PUBLICO_SALUD_2017 ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+TASA_DE_MORTALIDAD_2017[TASA_DE_MORTALIDAD_2017 ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+PREVALENCIA_DE_DESNUTRICION_2017[PREVALENCIA_DE_DESNUTRICION_2017 ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+GASTO_PUBLICO_SALUD_2017=GASTO_PUBLICO_SALUD_2017[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(3:4)]
+```
+
+```{r,echo=FALSE}
+TASA_DE_MORTALIDAD_2017=TASA_DE_MORTALIDAD_2017[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(1:2)]
+```
+
+```{r,echo=FALSE}
+PREVALENCIA_DE_DESNUTRICION_2017=PREVALENCIA_DE_DESNUTRICION_2017[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(3:4)]
+```
+
+```{r,echo=FALSE}
+names(GASTO_PUBLICO_SALUD_2017) = c("Country Name", "Country Code", "Gasto Publico Salud 2017")
+GASTO_PUBLICO_SALUD_2017$`Gasto Publico Salud 2017` = as.numeric(GASTO_PUBLICO_SALUD_2017$`Gasto Publico Salud 2017`)
+```
+
+```{r,echo=FALSE}
+names(TASA_DE_MORTALIDAD_2017) = c("Country Name", "Country Code", "Tasa de Mortalidad 2017")
+TASA_DE_MORTALIDAD_2017$`Tasa de Mortalidad 2017` = as.numeric(TASA_DE_MORTALIDAD_2017$`Tasa de Mortalidad 2017`)
+```
+
+```{r,echo=FALSE}
+names(PREVALENCIA_DE_DESNUTRICION_2017) = c("Country Name", "Country Code", "Prevalencia de Desnutricion 2017")
+PREVALENCIA_DE_DESNUTRICION_2017$`Prevalencia de Desnutricion 2017` = as.numeric(PREVALENCIA_DE_DESNUTRICION_2017$`Prevalencia de Desnutricion 2017`)
+```
+
+```{r,echo=FALSE}
+DataG = merge(GASTO_PUBLICO_SALUD_2017, TASA_DE_MORTALIDAD_2017, by = c("Country Name", "Country Code"))
+```
+
+```{r,echo=FALSE}
+DataG = merge(DataG, PREVALENCIA_DE_DESNUTRICION_2017, by = c("Country Name", "Country Code"))
+```
+
+```{r,echo=FALSE}
+DataG = na.omit(DataG)
+names(DataG) = c("Country Name", "Country Code", "Gasto Publico en Salud", "Tasa de Mortalidad", "Prevalencia de Desnutricion")
+```
+
+```{r,echo=FALSE}
+independ = data.frame(DataG$`Gasto Publico en Salud`, DataG$`Prevalencia de Desnutricion`)
+```
+
+```{r,echo=FALSE}
+row.names(independ)=DataG$`Country Name`
+```
+
+## Verificacion de la distribucion
+
+```{r,echo=FALSE}
+boxplot(independ,horizontal=T,las=2,cex.axis=0.3)
+```
+```{r,echo=FALSE}
+boxplot(log(independ),horizontal=T,las=2,cex.axis=0.3)
+```
+```{r,echo=FALSE}
+boxplot(scale(independ),horizontal=T,las=2,cex.axis=0.3)
+```
+```{r,echo=FALSE}
+library(cluster)
+library(fpc)
+library(factoextra)
+independ = log(independ)
+set.seed(123)
+g.dist = daisy(independ, metric="gower")
+```
+
+Los graficos nos permiten visualizar cual es la distribucion en comparacion de ambas variables, el tamaño de los datos. Lo que realizamos con los 3 graficos es modificar los valores para que sean similares. En el primero, encontramos una distribucion muy grande. Por ello, utilizamos la herramienta scale y log para que ambas medidas puedan ser cercanas y similares. No se modifican los valores reales sino modificamos con el fin de que las variables se mantengan, reescalamos las variables.
+
+# Proponemos la cantidad de clusters
+
+Las siguientes gráficas proponen la cantidad de clusters a solicitar mediante el uso del estadistico gap:
+
+1. PAM
+
+```{r,echo=FALSE}
+fviz_nbclust(independ, pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
+```
+
+2. AGNES
+
+```{r,echo=FALSE}
+fviz_nbclust(independ, hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F,hc_func = "agnes")
+```
+
+3. DIANA
+
+```{r,echo=FALSE}
+fviz_nbclust(independ, hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F,hc_func = "diana")
+```
+
+# Evaluemos los resultados
+Pidamos 2 grupos
+
+```{r,echo=FALSE}
+set.seed(123)
+res.pam=pam(g.dist,k = 2,cluster.only = F)
+independ$pam=res.pam$cluster
+```
+
+```{r,echo=FALSE}
+res.agnes <- hcut(g.dist, k = 2,hc_func='agnes')
+independ$agnes=res.agnes$cluster
+res.diana <- hcut(g.dist, k = 2,hc_func='diana')
+independ$diana=res.diana$cluster
+```
+
+1. PAM
+```{r,echo=FALSE}
+fviz_silhouette(res.pam)
+```
+2. AGNES
+```{r,echo=FALSE}
+fviz_silhouette(res.agnes)
+```
+3. DIANA
+```{r,echo=FALSE}
+fviz_silhouette(res.diana)
+```
+Se puede concluir que estos datos fueron mejor clusterizados usando el metodo jerarquico divisivo.
+
+```{r,echo=FALSE}
+aggregate(data=independ,.~diana,FUN=mean)
+```
+
+```{r,echo=FALSE}
+independ$diana = factor(independ$diana, 
+                    levels = c(1:2), 
+                    labels = c("Baja salud","Alta salud"))
+```
+
+```{r,echo=FALSE}
+fviz_dend(res.diana, cex = 0.4, horiz = T)
+```
+
+El dendograma nos muestra el proceso de conglomeracion
+
+Por lo anterior, sabemos que utilizaremos la tecnica DIANA y, por tal motivo, graficaremos la distribucion
+```{r}
+proyeccion = cmdscale(g.dist, k=2,add = T) # k es la cantidad de dimensiones
+independ$dim1 <- proyeccion$points[,1]
+independ$dim2 <- proyeccion$points[,2]
+base= ggplot(independ,aes(x=dim1, y=dim2,label=row.names(independ))) 
+base + geom_text(size=2, aes(color=as.factor(diana)))  + labs(title = "DIANA") 
+```
+
+Este grafico evidencia que los paises ubicados al lado izquierdo de la tabla poseen una menor tasa de salud; es decir, mayores indices de mortalidad entre su poblacion. En cambio, los paises ubicados a la derecha y de color celeste indican una mayor tasa de salud, lo que tambien indica que poseen menores indices de mortalidad entre los ciudadanos que habitan sus territorios.
+
+```{r,echo=FALSE}
+ANEMIA = read.csv("https://raw.githubusercontent.com/JimenaHA/Trabajo_Grupal/main/Data_anemia.csv")
+```
+
+```{r,echo=FALSE}
+ANEMIA[ANEMIA ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+ANEMIA=ANEMIA[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(1:2)]
+```
+
+```{r,echo=FALSE}
+names(ANEMIA) = c("Country Name", "Country Code", "Anemia")
+```
+
+```{r,echo=FALSE}
+ANEMIA$`Anemia` = as.numeric(ANEMIA$`Anemia`)
+```
+
+```{r,echo=FALSE}
+ACCESOAGUA = read.csv("https://raw.githubusercontent.com/JimenaHA/Trabajo_Grupal/main/AccesAgua_Data.csv")
+```
+
+```{r,echo=FALSE}
+ACCESOAGUA[ACCESOAGUA ==  ".." ] = NA
+```
+
+```{r,echo=FALSE}
+ACCESOAGUA=ACCESOAGUA[-c(2,3,10,40,43,63:66,75:79,83,101,102,106,108:111,132:135,137,144:146,160:163,180,184,185,187,188,198,199,217,221,222,230:232,255,263,267:271),-c(3:4)]
+```
+
+```{r,echo=FALSE}
+names(ACCESOAGUA) = c("Country Name", "Country Code", "Acceso al Agua")
+```
+
+```{r,echo=FALSE}
+ACCESOAGUA$`Acceso al Agua` = as.numeric(ACCESOAGUA$`Acceso al Agua`)
+```
+
+```{r,echo=FALSE}
+DataG=merge(DataG, ANEMIA, by = c("Country Name", "Country Code"))
+DataG=merge(DataG, ACCESOAGUA, by = c("Country Name", "Country Code"))
+```
+
+Ahora que hemos explicado nuestras variables, confirmaremos nuestra teoría mediante el Analisis Factorial Exploratorio y el Confirmatorio.
+
+
+## Análisis Factorial Exploratorio
+Demostraremos si el valor final que nos dan las dos variables independientes es correcto, que tan bien medido ha sido. Asimismo, le agregaremos dos nuevas variables: acceso al agua y anemia.
+
+```{r,echo=FALSE}
+library(polycor)
+dataMatrixF=DataG[,c(3,5,6,7)]
+MatrixFact=polycor::hetcor(dataMatrixF)$correlations
+```
+
+### calculamos la Matriz de Correlación
+
+```{r,echo=FALSE}
+library(ggcorrplot)
+ggcorrplot(MatrixFact)
+```
+
+Este grafico nos indica que los cuadros con tonalidades rojas son en los que se encuentra cierto tipo de correlacion alta entre las variables ubicadas a la izquierda y debajo del recuadro. Ademas, los cuadros de color azul nos indican un indice de correlacion bastante bajo. Entonces, se puede deducir que las variables gasto publico en salud y acceso al agua pueden explicar la variable dependiente, Tasa de Mortalidad. Por otro lado, las variables prevalencia de desnutricion y anemia tambien pueden hacerlo en conjunto. En ese sentido, podemos observar bloques correlacionados, lo cual nos da la esperanza de un buen analisis factorial. 
+
+```{r,echo=FALSE}
+#install.packages("psych")
+library(psych)
+psych::KMO(MatrixFact) 
+```
+Verificar si la matriz de corrrelaciones es adecuada
+
+```{r,echo=FALSE}
+cortest.bartlett(MatrixFact,n=nrow(DataG))$p.value>0.05
+```
+```{r,echo=FALSE}
+#install.packages("matrixcalc")
+library(matrixcalc)
+is.singular.matrix(MatrixFact)
+```
+Se determina en cuantos factores o variables latentes podríamos redimensionar la data. En este caso, indica que deberian ser 2. 
+
+```{r,echo=FALSE}
+fa.parallel(dataMatrixF,fm = 'ML', fa = 'fa',correct = T)
+```
+### Confirmacion de las variables latentes
+
+```{r,echo=FALSE}
+#install.packages("GPArotation")
+library(GPArotation)
+resultF <- fa(dataMatrixF,
+            nfactors = 2,
+            cor = 'mixed',
+            rotate = "varimax",
+            fm="minres")
+print(resultF$loadings)
+```
+```{r,echo=FALSE}
+print(resultF$loadings,cutoff = 0.5)
+```
+```{r,echo=FALSE}
+fa.diagram(resultF)
+```
+
+En este caso, no obtenemos un caso simple debido al analisis factorial. Por lo cual, sugeriremos llamar Acceso a Alimentacion de Calidad (MR1) y Gasto Publico (MR2). Estas dos variables nos ayudarian a poder explicar nuestra variable dependiente inicial, que es la siguiente: Tasa de Mortalidad. 
+En primer lugar, la anemia como menciona la Organización de las Naciones Unidas para la Alimentación y la Agricultura es ocasionada debido a una baja calidad alimentativa debido a que, como se menciona: "La anemia tiene una estrecha relación con la carencia de micronutrientes, es decir, que el acceso a una dieta saludable tiene un papel importante en su prevención y en las consecuencias que acarrea durante el embarazo, el parto y en la salud de la madre y del recién nacido." (42, 2020). Asimismo, la relacion entre la desnutricion y el acceso a una dieta balanceada y de calidad es bastante estrecho debido a que Unicef menciona que "al menos uno de cada tres niños menores de cinco años –o más de 200 millones– está desnutrido o sufre sobrepeso. Casi 2 de cada 3 niños entre los seis meses y los dos años de edad no reciben alimentos que potencien un crecimiento rápido de sus cuerpos y sus cerebros. Esta situación puede perjudicar su desarrollo cerebral, interferir con su aprendizaje, debilitar su sistema inmunológico y aumentar el riesgo de infección y, en muchos casos, de muerte." (2019).
+
+```{r,echo=FALSE}
+sort(resultF$communality)
+```
+```{r,echo=FALSE}
+sort(resultF$complexity)
+```
+```{r,echo=FALSE}
+names(dataMatrixF) = c("Gasto", "Desnutricion", "Anemia", "Agua")
+```
+
+```{r,echo=FALSE}
+LATENTES = 'Alimentacion =~ Agua + Anemia + Desnutricion 
+Inversion =~ Gasto'
+```
+
+```{r,echo=FALSE}
+library(lavaan)
+library(BBmisc)
+dataMatrixF = na.omit(dataMatrixF)
+CFA = cfa(LATENTES, 
+          data=dataMatrixF, 
+          std.lv = TRUE, 
+          missing = "fiml")
+```
+
+```{r,echo=FALSE}
+allParamCFA=parameterEstimates(CFA,standardized = T)
+allFitCFA=as.list(fitMeasures(CFA))
+```
+
+```{r,echo=FALSE}
+allParamCFA[allParamCFA$op=="=~",c("lhs","rhs","pvalue","std.all")]
+```
+
+```{r,echo=FALSE}
+allFitCFA[c("chisq", "df", "pvalue")] # pvalue>0.05
+```
+
+```{r,echo=FALSE}
+allFitCFA$tli # > 0.90
+```
+
+```{r,echo=FALSE}
+allFitCFA[c('rmsea.ci.lower','rmsea' ,'rmsea.ci.upper')]
+```
+```{r,echo=FALSE}
+DataG = na.omit(DataG)
+scores=as.data.frame(lavPredict(CFA))
+DataG$Alimentacion=normalize(scores$Alimentacion,
+                    method = "range", 
+                    margin=2, # by column
+                    range = c(0, 100))
+DataG$Inversion=normalize(scores$Inversion,
+                    method = "range", 
+                    margin=2, # by column
+                    range = c(0, 100))
+```
+
+
+### Regresion Lineal
+
+```{r,echo=FALSE}
+modelo1 = formula(`Tasa de Mortalidad`~`Alimentacion`+`Inversion`)
+rg=lm(modelo1,data=DataG)
+summary(rg)
+```
+Asi, mediante la regresión presentada, se evidencia que tanto el acceso a una alimentacion de calidad y la inversion estatal influyen en la tasa de mortalidad en terminos de paises. 
+
+### Stargazer
+
+```{r,echo=FALSE}
+reg1=lm(modelo1,data=DataG)
+library(stargazer)
+stargazer(reg1, type = "text")
+```
+Stargazer nos permite visualizar los indices de las regresiones en una interfaz mas facil de interpretar. Lo cual nos indica que ambas variables, MR1 y MR2 ahora llamadas Inversion y Alimentacion, influyen en el resultado de la Tasa de Mortalidad.
+
+### Prueba Anova
+```{r,echo=FALSE}
+anova(rg)
+```
+De acuerdo a la prueba Anova y la regresion lineal, podemos afirmar que existe una regresion valida debido a que se encuentra por encima del valor 0.05. Por lo cual, podriamos concluir que ambas variables poseen una relacion directa con la variable dependiente ya que, a mayor inversion, menos indice y cantidad de muertos por pais; tambien, a mayor calidad en la alimentacion de la ciudadania en su conjunto, ocurre una menor cantidad en los indices de mortalidad.
+
+# Conclusiones:
+Lo mencionado anteriormente puede ser demostrado mediante metodologia cualitativa debido a que hay autores e instituciones como  Organización de las Naciones Unidas para la Alimentación y la
+Agricultura sobre EL ESTADO DEL MUNDO que mencionan, a modo de conclusion, lo siguiente: "Los países donde el gasto en sanidad per cápita es menor, y donde hay más población que carece de acceso a agua gestionada adecuadamente y saneamiento, también tienden a registrar una prevalencia de la inseguridad alimentaria más elevada. Asimismo, el acceso a estos servicios públicos relacionados con la salud repercute de manera importante en dos indicadores clave del estado de salud de un país —la mortalidad infantil y la esperanza de vida— que están estrechamente correlacionados con la prevalencia de la inseguridad alimentaria nacional."(2019)
+
+## **Bibliografia:**
+
+INEI. (2000). Metodología para el Cálculo de los Indicadores de Mortalidad. 07 de julio del 2022, de INEI Sitio web: https://www.inei.gob.pe/media/MenuRecursivo/metodologias/mortalidad01.pdf
+
+Organización de las Naciones Unidas para la Alimentación y la Agricultura . (2019). El estado de la seguridad alimentaria y la nutrición en el mundo 2019. 08 de julio del 2022, de Organización de las Naciones Unidas para la Alimentación y la Agricultura Sitio web: https://www.fao.org/3/ca5162es/ca5162es.pdf 
+
+Organización de las Naciones Unidas para la Alimentación y la Agricultura. (2020). Panorama de la seguridad alimentaria y nutricional. 08 de julio del 2022, de Organización de las Naciones Unidas para la Alimentación y la Agricultura Sitio web: https://www.fao.org/3/cb2242es/cb2242es.pdf 
+
+Sabrina Sidhu. (2019). La mala alimentación perjudica la salud de los niños en todo el mundo, advierte UNICEF. 07 de julio del 2022, de Unicef Sitio web: https://www.unicef.org/es/comunicados-prensa/la-mala-alimentaci%C3%B3n-perjudica-la-salud-de-los-ni%C3%B1os-en-todo-el-mundo-advierte
